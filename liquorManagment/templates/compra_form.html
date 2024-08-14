@@ -1,14 +1,130 @@
-{% extends "base.html" %}
-{% block title %}Registrar Compra{% endblock title %}
+{% extends 'base.html' %}
+
+{% block title %}
+  Registrar Compra
+{% endblock %}
 
 {% block content %}
-<div class="container my-5">
+  <div class="container my-5">
     <h1 class="text-center mb-4">Registrar Compra</h1>
     <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Registrar</button>
-        <a href="{% url 'liquorManagment:orderList' %}" class="btn btn-secondary">Cancelar</a>
+      {% csrf_token %}
+
+      <!-- Cliente -->
+      <div class="form-group">
+        <label for="id_client_fk">Cliente</label>
+        <select class="form-control" id="id_client_fk" name="id_client_fk">
+          {% for Client in clients %}
+            <option value="{{ Client.id_client }}">{{ Client.name }} {{ Client.last_name }}</option>
+          {% endfor %}
+        </select>
+        {% if form.id_client_fk.errors %}
+          <div class="text-danger">{{ form.id_client_fk.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Fecha de Orden -->
+      <div class="form-group">
+        <label for="order_date">Fecha Orden</label>
+        <input type="date" class="form-control" id="order_date" name="order_date" value="{{ form.order_date.value }}" />
+        {% if form.order_date.errors %}
+          <div class="text-danger">{{ form.order_date.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Formset de Productos -->
+      <h4>Productos</h4>
+      {{ formset.management_form }}
+      <table class="table" id="products_table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- No se agregan filas automáticamente -->
+        </tbody>
+      </table>
+      <button type="button" class="btn btn-primary" id="add_product_btn">Añadir Producto</button>
+
+      <!-- Precio Total -->
+      <div class="form-group mt-4">
+        <label for="total_price">Precio Total</label>
+        <input type="text" class="form-control" id="total_price" name="total_price" readonly value="0.00" />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Registrar</button>
+      <a href="{% url 'liquorManagment:orderList' %}" class="btn btn-secondary">Cancelar</a>
     </form>
-</div>
-{% endblock content %}
+  </div>
+
+  <script>
+    // Manejar la adición de nuevos productos
+    document.getElementById('add_product_btn').addEventListener('click', function () {
+      const tbody = document.getElementById('products_table').querySelector('tbody');
+      const totalForms = parseInt('{{ formset.total_forms }}');
+      const newRow = document.createElement('tr');
+
+      newRow.innerHTML = `
+        <td>
+          <select class="form-control product_select" name="form-${totalForms}-product_id_fk">
+            <option value="" disabled selected>Seleccione un producto</option>
+            {% for Product in products %}
+              <option value="{{ Product.id_product }}" data-price="{{ Product.price }}">{{ Product.product_name }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td><input type="number" class="form-control quantity_input" value="1" min="1"></td>
+        <td class="price_cell" data-price="0.00">0.00</td>
+        <td><button type="button" class="btn btn-danger remove_product_btn">Eliminar</button></td>
+      `;
+
+      tbody.appendChild(newRow);
+      updateTotalPrice();
+    });
+
+    // Manejar la eliminación de productos
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('remove_product_btn')) {
+        const row = e.target.closest('tr');
+        row.remove();
+        updateTotalPrice();
+      }
+    });
+
+    // Manejar el cambio de producto o cantidad
+    document.addEventListener('input', function (e) {
+      if (e.target.classList.contains('product_select') || e.target.classList.contains('quantity_input')) {
+        const row = e.target.closest('tr');
+        const productSelect = row.querySelector('.product_select');
+        const quantityInput = row.querySelector('.quantity_input');
+        const priceCell = row.querySelector('.price_cell');
+
+        const price = parseFloat(productSelect.selectedOptions[0].getAttribute('data-price'));
+        const quantity = parseInt(quantityInput.value);
+
+        const totalPrice = (price * quantity).toFixed(2);
+        priceCell.setAttribute('data-price', totalPrice);
+        priceCell.textContent = totalPrice;
+
+        updateTotalPrice();
+      }
+    });
+
+    // Actualizar el precio total
+    function updateTotalPrice() {
+      const totalPriceInput = document.getElementById('total_price');
+      const priceCells = document.querySelectorAll('.price_cell');
+      let totalPrice = 0;
+
+      priceCells.forEach(function (cell) {
+        totalPrice += parseFloat(cell.getAttribute('data-price'));
+      });
+
+      totalPriceInput.value = totalPrice.toFixed(2);
+    }
+  </script>
+{% endblock %}

@@ -1,4 +1,5 @@
 from django.shortcuts import render,get_list_or_404, redirect, get_object_or_404
+from django.forms import modelformset_factory
 from django.http import HttpResponse
 from django.template import loader
 from .models import Category, Product,Client,Purchase_order,Order_item
@@ -174,27 +175,58 @@ def orderDetail(request, id_purchase_order):
     return HttpResponse(template.render(context, request))
 
 @login_required
-def addOrder(request):
+def addItem(request):
     if request.method == "POST":
-        form = PurchaseOrderForm(request.POST)
+        form = OrderItemForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('liquorManagment:orderList')
+            return redirect('LiquorManagment:index')
+    else:
+        form = OrderItemForm()
+
+    return render(request, 'index.html', {'form': form})
+
+@login_required
+def addOrder(request):
+    OrderItemFormSet = modelformset_factory(Order_item, form=OrderItemForm, can_delete=True)
+
+    if request.method == "POST":
+        form = PurchaseOrderForm(request.POST)
+        formset = OrderItemFormSet(request.POST)
+
+        if form.is_valid():
+            order = form.save(commit=False)  # Guardar la orden de compra sin commit
+            order.save()
+
+        if formset.is_valid():
+            for form_item in formset:
+                order_item = Order_item()
+                order_item.purchase_order_id_fk = order  # Asignar el objeto order a cada item
+                order_item.product_id_fk = form_item.product
+                order_item.quantity = form_item.quantity
+                order_item.save()  # Guardar cada item
+
+                return redirect('liquorManagment:orderList')  # Redirigir después de guardar
+            else:
+                print("Formset no válido")
+                print(formset.errors)
+        else:
+            print("Formulario principal no válido")
+            print(form.errors)
     else:
         form = PurchaseOrderForm()
-    # Pendiente modificar      
-    return render(request, 'compra_form.html', {'form': form})
+        formset = OrderItemFormSet(queryset=Order_item.objects.none())
+        print("No es un POST request")
 
-
-# CRUD Items
-
-def itemList(request):
-    item = Order_item.objects.all()
+    clients = Client.objects.all()
+    products = Product.objects.filter(is_active=True)
     context = {
-        'Item': item
+        'form': form,
+        'formset': formset,
+        'clients': clients,
+        'products': products,
     }
-    # Pendiente Modificar
-    return render(request, 'categorias.html', context)
+    return render(request, 'compra_form.html', context)
 
 def itemDetail(request, purchase_order_id_fk):
     item = get_list_or_404(Order_item, pk=purchase_order_id_fk)
@@ -204,19 +236,6 @@ def itemDetail(request, purchase_order_id_fk):
         'Item': item
     }
     return HttpResponse(template.render(context, request))
-
-@login_required
-def addItem(request):
-    if request.method == "POST":
-        form = OrderItemForm(request.POST)
-        if form.is_valid():
-            form.save()
-            # Pendiente modificar
-            return redirect('LiquorManagment:index')
-    else:
-        form = OrderItemForm()
-    # Pendiente modificar      
-    return render(request, 'index.html', {'form': form})
 
 
 #Login

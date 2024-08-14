@@ -54,7 +54,21 @@ class ClientForm(forms.ModelForm):
             'email': 'Correo',
         }
 
+class OrderItemForm(forms.ModelForm):
+    class Meta:
+        model= Order_item
+        fields = ['purchase_order_id_fk','product_id_fk','quantity']
+        widgets={
+            'product_id_fk': forms.NumberInput(attrs={'class':'form-control'}),
+            'quantity': forms.NumberInput(attrs={'class':'form-control'}),
+        }
+        labels={
+            'product_id_fk': 'Producto',
+            'quantity': 'Cantidad',
+        }
+
 class PurchaseOrderForm(forms.ModelForm):
+    items = forms.BaseFormSet()  # Placeholder for formset
     class Meta:
         model= Purchase_order
         fields = ['id_client_fk','order_date','total_price']
@@ -68,21 +82,10 @@ class PurchaseOrderForm(forms.ModelForm):
             'order_date': 'Fecha Orden',
             'total_price': 'Precio Total',
         }
+    def __init__(self, *args, **kwargs):
+        super(PurchaseOrderForm, self).__init__(*args, **kwargs)
+        self.fields['id_client_fk'].queryset = Client.objects.all()  # Asegúrate de que los clientes estén disponibles
 
-class OrderItemForm(forms.ModelForm):
-    class Meta:
-        model= Order_item
-        fields = ['purchase_order_id_fk','product_id_fk','quantity']
-        widgets={
-            'purchase_order_id_fk': forms.NumberInput(attrs={'class':'form-control'}),
-            'product_id_fk': forms.NumberInput(attrs={'class':'form-control'}),
-            'quantity': forms.NumberInput(attrs={'class':'form-control'}),
-        }
-        labels={
-            'purchase_order_id_fk': 'Orden de Compra',
-            'product_id_fk': 'Producto',
-            'quantity': 'Cantidad',
-        }
         
                                                                                                        
 
