@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ Client.name }}{% endblock title %}
+{% block content %}
+    <div class="container my-5">
+        <h5 class="py-4 text-center"><strong>Detalles del Cliente</strong></h5>
+        <div class="row">
+            <div class="col-12 col-lg-8 mx-auto">
+                <div class="card border-0 shadow-lg rounded-3 bg-dark text-light">
+                    <div class="card-body">
+                        <h5 class="mb-4 text-center">{{ Client.name }}</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-dark text-light text-center"><strong>ID: </strong>{{ Client.identification }}</li>
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Nombre: </strong>{{ Client.name }}</li>
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Apellido: </strong>{{ Client.last_name }}</li>
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Email: </strong>{{ Client.email }}</li>
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Teléfono: </strong>{{ Client.phone }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+

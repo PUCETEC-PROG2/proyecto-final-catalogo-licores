@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Productos{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Productos de Licores</h1>
+    <a href="{% url 'liquorManagment:add_product' %}" class="btn btn-primary mb-3">Agregar Nuevo Producto</a>
+    <div class="row">
+        {% for Product in Product %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img src="{{ Product.product_image.url }}" class="card-img-top" alt="{{ Product.product_name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ Product.product_name }}</h5>
+                    {% comment %} <p class="card-text">{{ producto.descripcion }}</p> {% endcomment %}
+                    <p class="card-text"><strong>Precio:</strong> ${{ Product.price }}</p>
+                    <p class="card-text"><strong>Stock:</strong> {{ Product.available_stock }}</p>
+                    <a href="{% url 'liquorManagment:product_detail' Product.id_product %}" class="btn btn-outline-primary">Ver Detalles</a>
+                    <a href="{% url 'liquorManagment:edit_product' Product.id_product %}" class="btn btn-outline-secondary">Editar</a>
+                    <a href="{% url 'liquorManagment:remove_product' Product.id_product %}" class="btn btn-outline-danger">Eliminar</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

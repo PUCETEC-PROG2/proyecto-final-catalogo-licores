@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'liquorManagment'
 ]
 
 MIDDLEWARE = [
@@ -76,7 +77,7 @@ WSGI_APPLICATION = 'Liquor_Catalog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Catalog_Managment',
+        'NAME': 'trabajo_final_grupo2',
         'HOST': 'localhost',
         'PORT': '5438',
         'USER': 'postgres',
@@ -121,7 +122,17 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+#Media Files 
+MEDIA_URL ='/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Configuración de login
+LOGIN_REDIRECT_URL = '/'    
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = 'liquorManagment:login'

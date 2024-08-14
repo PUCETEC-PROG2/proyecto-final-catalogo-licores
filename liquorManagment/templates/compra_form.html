@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Registrar Compra{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Registrar Compra</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Registrar</button>
+        <a href="{% url 'liquorManagment:orderList' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock content %}

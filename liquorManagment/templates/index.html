@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Catálogo de Licores{% endblock title %}
+{% block content %}
+    <div class="container my-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold">Bienvenido a tu Catálogo de Licores</h1>
+            <p class="lead">Explora, conoce y disfruta</p>
+        </header>
+
+        <section class="row gy-5">
+            <!-- Categoría Section -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-lg rounded-3 overflow-hidden h-100">
+                    <div class="img-container">
+                        <img src="{% static 'categoria.jpg' %}" class="card-img-top img-fluid object-fit-cover" alt="Imagen de Categorías">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-4 bg-light">
+                        <h2 class="card-title text-center mb-3">Categoría</h2>
+                        <p class="card-text text-center mb-4">Explora las diferentes categorías de licores</p>
+                        <div class="text-center mt-auto">
+                            <a href="{% url 'liquorManagment:category' %}" class="btn btn-outline-primary btn-lg">Ver Categorías</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos Section -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-lg rounded-3 overflow-hidden h-100">
+                    <div class="img-container">
+                        <img src="{% static 'productos.jpg' %}" class="card-img-top img-fluid object-fit-cover" alt="Imagen de Productos">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-4 bg-light">
+                        <h2 class="card-title text-center mb-3">Productos</h2>
+                        <p class="card-text text-center mb-4">Descubre nuestros productos de alta calidad</p>
+                        <div class="text-center mt-auto">
+                            <a href="{% url 'liquorManagment:product' %}" class="btn btn-outline-success btn-lg">Ver Productos</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Clientes Section -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-lg rounded-3 overflow-hidden h-100">
+                    <div class="img-container">
+                        <img src="{% static 'clientes.jpg' %}" class="card-img-top img-fluid object-fit-cover" alt="Imagen de Clientes">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-4 bg-light">
+                        <h2 class="card-title text-center mb-3">Clientes</h2>
+                        <p class="card-text text-center mb-4">Gestiona y conoce a tus clientes</p>
+                        <div class="text-center mt-auto">
+                            <a href="{% url 'liquorManagment:client' %}" class="btn btn-outline-warning btn-lg">Ver Clientes</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compras Section -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-lg rounded-3 overflow-hidden h-100">
+                    <div class="img-container">
+                        <img src="{% static 'compras.png' %}" class="card-img-top img-fluid object-fit-cover" alt="Imagen de Compras">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-4 bg-light">
+                        <h2 class="card-title text-center mb-3"><br>Compras</h2>
+                        <p class="card-text text-center mb-4">Revisa y gestiona tus compras recientes</p>
+                        <div class="text-center mt-auto">
+                            <a href="{% url 'liquorManagment:orderList' %}" class="btn btn-outline-danger btn-lg">Ver Compras</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock content %}
+
+<style>
+    .img-container {
+        width: 100%;
+        max-width: 100%; /* Mantiene el ancho del contenedor al 100% del elemento padre */
+        height: 250px; /* Fija la altura de todas las imágenes */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Oculta cualquier parte de la imagen que sobresalga */
+    }
+    
+    .img-container img {
+        width: 100%;
+        height: auto; /* Mantiene la proporción original de la imagen */
+        object-fit: cover; /* Asegura que la imagen cubra todo el contenedor */
+    }    
+</style>

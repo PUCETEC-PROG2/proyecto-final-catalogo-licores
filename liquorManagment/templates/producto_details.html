@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ Product.product_name }}{% endblock title %}
+{% block content %}
+    <div class="container my-5">
+        <h5 class="py-4 text-center"><strong>Detalles del Producto</strong></h5>
+        <div class="row">
+            <!-- Detalles del Producto -->
+            <div class="col-12 col-lg-5 mb-4 mb-lg-0">
+                <div class="card border-0 shadow-lg rounded-3 bg-dark text-light">
+                    <div class="card-body">
+                        <h5 class="mb-4 text-center">{{ Product.product_name }}</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Nombre: </strong>{{ Product.product_name }}</li>
+                            {% comment %} <li class="list-group-item bg-dark text-light text-center"><strong>Descripción: </strong>{{ Product.prod }}</li> {% endcomment %}
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Precio: </strong>${{ Product.price }}</li>
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Stock: </strong>{{ Product.available_stock }}</li>
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Categoría: </strong>{{ Product.Category_id_fk.category_name }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- Imagen del Producto -->
+            <div class="col-12 col-lg-7 text-center">
+                <div class="product-image-container position-relative">
+                    <img src="{{ Product.product_image.url }}" class="img-fluid rounded-3 shadow-lg" alt="{{ Product.product_name }}">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+

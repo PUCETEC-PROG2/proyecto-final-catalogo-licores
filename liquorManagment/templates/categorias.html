@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Categorías{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Categorías de Licores</h1>
+    <a href="{% url 'liquorManagment:add_category' %}" class="btn btn-primary mb-3">Agregar Nueva Categoría</a>
+    <div class="row">
+        {% for Category in Category %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ Category.category_name }}</h5>
+                    {% comment %} <p class="card-text">{{ categoria.descripcion }}</p> {% endcomment %}
+                    <a href="{% url 'liquorManagment:category_detail' Category.id_category %}" class="btn btn-outline-primary">Ver Detalles</a>
+                    <a href="{% url 'liquorManagment:edit_category' Category.id_category %}" class="btn btn-outline-secondary">Editar</a>
+                    <a href="{% url 'liquorManagment:remove_category' Category.id_category %}" class="btn btn-outline-danger">Eliminar</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

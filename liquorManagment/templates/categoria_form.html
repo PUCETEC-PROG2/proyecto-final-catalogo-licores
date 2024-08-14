@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Agregar/Editar Categoría{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Agregar/Editar Categoría</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{% url 'liquorManagment:category' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock content %}

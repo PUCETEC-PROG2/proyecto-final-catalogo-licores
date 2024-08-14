@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ Category.category_name }}{% endblock title %}
+{% block content %}
+    <div class="container my-5">
+        <h5 class="py-4 text-center"><strong>Detalles de la Categoría</strong></h5>
+        <div class="row">
+            <div class="col-12 col-lg-8 mx-auto">
+                <div class="card border-0 shadow-lg rounded-3 bg-dark text-light">
+                    <div class="card-body">
+                        <h5 class="mb-4 text-center">{{ Category.category_name }}</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-dark text-light text-center"><strong>Nombre: </strong>{{ Category.category_name }}</li>
+                            {% comment %} <li class="list-group-item bg-dark text-light text-center"><strong>Descripción: </strong>{{ categoria.descripcion }}</li> {% endcomment %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
