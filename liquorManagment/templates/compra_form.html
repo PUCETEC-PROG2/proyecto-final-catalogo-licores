@@ -1,130 +1,61 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crear Orden de Compra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evSX huddled7vJEuBfRn5qWB88FuvIWJhxuzvVu0YXdbv/j8LqYzx4WpDWuxBjy" crossorigin="anonymous" />
+  </head>
+  <body>
+    <div class="container mt-3">
+      <h1>Crear Orden de Compra</h1>
+      <form method="post">
+        {% csrf_token %}
+        {{ order_form.as_p }}
 
-{% block title %}
-  Registrar Compra
-{% endblock %}
+        <h2>Productos</h2>
+        <table class="table table-bordered" id="product-table">
+          <thead>
+            <tr>
+              <th>Nombre Producto</th>
+              <th>Precio Unitario</th>
+              <th>Cantidad</th>
+              <th>Precio Final</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>{{ order_item_formset.as_p }}</tbody>
+        </table>
+        <button type="button" class="btn btn-primary mb-3" id="add-product">Añadir Producto</button>
+        <p>
+          <b>Precio Total:</b> <span id="total-price">{{ order_form.total_price.value }}</span>
+        </p>
 
-{% block content %}
-  <div class="container my-5">
-    <h1 class="text-center mb-4">Registrar Compra</h1>
-    <form method="POST">
-      {% csrf_token %}
+        <button type="submit" class="btn btn-success">Registrar Orden</button>
+      </form>
+    </div>
 
-      <!-- Cliente -->
-      <div class="form-group">
-        <label for="id_client_fk">Cliente</label>
-        <select class="form-control" id="id_client_fk" name="id_client_fk">
-          {% for Client in clients %}
-            <option value="{{ Client.id_client }}">{{ Client.name }} {{ Client.last_name }}</option>
-          {% endfor %}
-        </select>
-        {% if form.id_client_fk.errors %}
-          <div class="text-danger">{{ form.id_client_fk.errors }}</div>
-        {% endif %}
-      </div>
-
-      <!-- Fecha de Orden -->
-      <div class="form-group">
-        <label for="order_date">Fecha Orden</label>
-        <input type="date" class="form-control" id="order_date" name="order_date" value="{{ form.order_date.value }}" />
-        {% if form.order_date.errors %}
-          <div class="text-danger">{{ form.order_date.errors }}</div>
-        {% endif %}
-      </div>
-
-      <!-- Formset de Productos -->
-      <h4>Productos</h4>
-      {{ formset.management_form }}
-      <table class="table" id="products_table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- No se agregan filas automáticamente -->
-        </tbody>
-      </table>
-      <button type="button" class="btn btn-primary" id="add_product_btn">Añadir Producto</button>
-
-      <!-- Precio Total -->
-      <div class="form-group mt-4">
-        <label for="total_price">Precio Total</label>
-        <input type="text" class="form-control" id="total_price" name="total_price" readonly value="0.00" />
-      </div>
-
-      <button type="submit" class="btn btn-primary">Registrar</button>
-      <a href="{% url 'liquorManagment:orderList' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
-  </div>
-
-  <script>
-    // Manejar la adición de nuevos productos
-    document.getElementById('add_product_btn').addEventListener('click', function () {
-      const tbody = document.getElementById('products_table').querySelector('tbody');
-      const totalForms = parseInt('{{ formset.total_forms }}');
-      const newRow = document.createElement('tr');
-
-      newRow.innerHTML = `
-        <td>
-          <select class="form-control product_select" name="form-${totalForms}-product_id_fk">
-            <option value="" disabled selected>Seleccione un producto</option>
-            {% for Product in products %}
-              <option value="{{ Product.id_product }}" data-price="{{ Product.price }}">{{ Product.product_name }}</option>
-            {% endfor %}
-          </select>
-        </td>
-        <td><input type="number" class="form-control quantity_input" value="1" min="1"></td>
-        <td class="price_cell" data-price="0.00">0.00</td>
-        <td><button type="button" class="btn btn-danger remove_product_btn">Eliminar</button></td>
-      `;
-
-      tbody.appendChild(newRow);
-      updateTotalPrice();
-    });
-
-    // Manejar la eliminación de productos
-    document.addEventListener('click', function (e) {
-      if (e.target.classList.contains('remove_product_btn')) {
-        const row = e.target.closest('tr');
-        row.remove();
-        updateTotalPrice();
-      }
-    });
-
-    // Manejar el cambio de producto o cantidad
-    document.addEventListener('input', function (e) {
-      if (e.target.classList.contains('product_select') || e.target.classList.contains('quantity_input')) {
-        const row = e.target.closest('tr');
-        const productSelect = row.querySelector('.product_select');
-        const quantityInput = row.querySelector('.quantity_input');
-        const priceCell = row.querySelector('.price_cell');
-
-        const price = parseFloat(productSelect.selectedOptions[0].getAttribute('data-price'));
-        const quantity = parseInt(quantityInput.value);
-
-        const totalPrice = (price * quantity).toFixed(2);
-        priceCell.setAttribute('data-price', totalPrice);
-        priceCell.textContent = totalPrice;
-
-        updateTotalPrice();
-      }
-    });
-
-    // Actualizar el precio total
-    function updateTotalPrice() {
-      const totalPriceInput = document.getElementById('total_price');
-      const priceCells = document.querySelectorAll('.price_cell');
-      let totalPrice = 0;
-
-      priceCells.forEach(function (cell) {
-        totalPrice += parseFloat(cell.getAttribute('data-price'));
-      });
-
-      totalPriceInput.value = totalPrice.toFixed(2);
-    }
-  </script>
-{% endblock %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+          $(document).ready(function() {
+            // Función para agregar una nueva fila a la tabla
+            function addRow() {
+                // ... (código para clonar una fila y agregarla a la tabla)
+            }
+        
+            // Función para calcular el precio total
+            function calculateTotal() {
+                // ... (código para calcular el total de todos los productos)
+            }
+        
+            // Función para eliminar una fila
+            function deleteRow(row) {
+                // ... (código para eliminar la fila seleccionada)
+            }
+        
+            // Eventos
+            $('#add-product').click(addRow);
+            // ... (otros eventos)
+        });        });
+    </script>
+  </body>
+</html>

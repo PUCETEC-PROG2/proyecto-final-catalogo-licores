@@ -3,7 +3,7 @@ from django.forms import modelformset_factory
 from django.http import HttpResponse
 from django.template import loader
 from .models import Category, Product,Client,Purchase_order,Order_item
-from liquorManagment.forms import CategoryForm,ProductForm,ClientForm,PurchaseOrderForm,OrderItemForm
+from liquorManagment.forms import CategoryForm,ProductForm,ClientForm,PurchaseOrderForm,OrderItemForm, OrderItemFormSet
 
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
@@ -187,57 +187,36 @@ def addItem(request):
     return render(request, 'index.html', {'form': form})
 
 @login_required
+
 def addOrder(request):
-    OrderItemFormSet = modelformset_factory(Order_item, form=OrderItemForm, can_delete=True)
+    if request.method == 'POST':
+        purchase_order_form = PurchaseOrderForm(request.POST)
+        order_item_formset = OrderItemFormSet(request.POST, prefix='order_items')
 
-    if request.method == "POST":
-        form = PurchaseOrderForm(request.POST)
-        formset = OrderItemFormSet(request.POST)
+        if purchase_order_form.is_valid() and order_item_formset.is_valid():
+            purchase_order = purchase_order_form.save(commit=False)
+            purchase_order.total_price = 0  # Inicializa el precio total en 0
 
-        if form.is_valid():
-            order = form.save(commit=False)  # Guardar la orden de compra sin commit
-            order.save()
+            purchase_order.save()  # Guarda la orden de compra
 
-        if formset.is_valid():
-            for form_item in formset:
-                order_item = Order_item()
-                order_item.purchase_order_id_fk = order  # Asignar el objeto order a cada item
-                order_item.product_id_fk = form_item.product
-                order_item.quantity = form_item.quantity
-                order_item.save()  # Guardar cada item
+            for form in order_item_formset:
+                order_item = form.save(commit=False)
+                order_item.purchase_order_id_fk = purchase_order
+                order_item.save()
+                purchase_order.total_price += order_item.product_id_fk.price * order_item.quantity
 
-                return redirect('liquorManagment:orderList')  # Redirigir después de guardar
-            else:
-                print("Formset no válido")
-                print(formset.errors)
-        else:
-            print("Formulario principal no válido")
-            print(form.errors)
+            purchase_order.save()  # Guarda el precio total actualizado
+
+            return redirect('liquorManagment:orderList')  # Redirige a la lista de órdenes de compra después de guardar
+
     else:
-        form = PurchaseOrderForm()
-        formset = OrderItemFormSet(queryset=Order_item.objects.none())
-        print("No es un POST request")
+        purchase_order_form = PurchaseOrderForm()
+        order_item_formset = OrderItemFormSet(prefix='order_items')
 
-    clients = Client.objects.all()
-    products = Product.objects.filter(is_active=True)
-    context = {
-        'form': form,
-        'formset': formset,
-        'clients': clients,
-        'products': products,
-    }
-    return render(request, 'compra_form.html', context)
-
-def itemDetail(request, purchase_order_id_fk):
-    item = get_list_or_404(Order_item, pk=purchase_order_id_fk)
-    # Pendiente Modificar
-    template = loader.get_template('categorias.html')
-    context = {
-        'Item': item
-    }
-    return HttpResponse(template.render(context, request))
-
-
+    return render(request, 'compra_form.html', {
+        'purchase_order_form': purchase_order_form,
+        'order_item_formset': order_item_formset,
+    })
 #Login
 class CustomLoginView(LoginView):
     template_name = 'login.html'

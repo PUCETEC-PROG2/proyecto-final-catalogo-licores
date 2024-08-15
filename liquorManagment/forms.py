@@ -1,5 +1,6 @@
 from django import forms
 from .models import Category, Product, Client, Purchase_order, Order_item
+from django.forms import inlineformset_factory
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -55,38 +56,46 @@ class ClientForm(forms.ModelForm):
         }
 
 class OrderItemForm(forms.ModelForm):
+    price = forms.DecimalField(
+        max_digits=10, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control', 'readonly': True})
+    )
+
     class Meta:
-        model= Order_item
-        fields = ['purchase_order_id_fk','product_id_fk','quantity']
-        widgets={
-            'product_id_fk': forms.NumberInput(attrs={'class':'form-control'}),
-            'quantity': forms.NumberInput(attrs={'class':'form-control'}),
+        model = Order_item
+        fields = ['product_id_fk', 'quantity', 'price']
+        widgets = {
+            'product_id_fk': forms.Select(attrs={'class': 'form-control'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control', 'onchange': 'calculateFinalPrice(this)'}),
         }
-        labels={
+        labels = {
             'product_id_fk': 'Producto',
             'quantity': 'Cantidad',
+            'price': 'Precio Unitario',
         }
 
 class PurchaseOrderForm(forms.ModelForm):
-    items = forms.BaseFormSet()  # Placeholder for formset
     class Meta:
-        model= Purchase_order
-        fields = ['id_client_fk','order_date','total_price']
-        widgets={
-            'id_client_fk': forms.Select(attrs={'class':'form-control','placeholder':'Ingrese el ID'}),
-            'order_date': forms.TextInput(attrs={'class':'form-control','placeholder':'Ingrese el nombre'}),
-            'total_price': forms.TextInput(attrs={'class':'form-control','placeholder':'Ingrese el Apellido'}),
+        model = Purchase_order
+        fields = ['id_client_fk', 'order_date', 'total_price']
+        widgets = {
+            'id_client_fk': forms.Select(attrs={'class': 'form-control'}),
+            'order_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'total_price': forms.NumberInput(attrs={'class': 'form-control', 'readonly': True}),
         }
-        labels={
+        labels = {
             'id_client_fk': 'Cliente',
             'order_date': 'Fecha Orden',
             'total_price': 'Precio Total',
         }
+
     def __init__(self, *args, **kwargs):
         super(PurchaseOrderForm, self).__init__(*args, **kwargs)
         self.fields['id_client_fk'].queryset = Client.objects.all()  # Asegúrate de que los clientes estén disponibles
 
-        
-                                                                                                       
-
-
+OrderItemFormSet = inlineformset_factory(
+    Purchase_order,  # Modelo principal
+    Order_item,      # Modelo del formset
+    form=OrderItemForm,  # Formulario
+    extra=1,         # Número de formularios vacíos iniciales
+    can_delete=True  # Permitir eliminar formularios
+)
